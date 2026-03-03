@@ -1,0 +1,25 @@
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    document.querySelectorAll(".view-reactions").forEach(button => {
+
+        button.addEventListener("click", function(e) {
+            e.preventDefault();
+
+            const postId = this.dataset.postId;
+
+            fetch(`/post/${postId}/reactions/`)
+                .then(response => response.json())
+                .then(data => {
+
+                    document.getElementById("reactionsModalBody").innerHTML = data.html;
+
+                    const modal = new bootstrap.Modal(document.getElementById('reactionsModal'));
+                    modal.show();
+                });
+        });
+
+    });
+
+});
+</script>

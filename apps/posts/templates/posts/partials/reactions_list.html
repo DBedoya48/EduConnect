@@ -1,0 +1,15 @@
+{% for reaction in reactions %}
+    <div class="d-flex justify-content-between mb-2">
+        <div>
+            {{ reaction.user.first_name }}
+        </div>
+
+        <div>
+            {% if reaction.reaction == 'like' %} 👍 {% endif %}
+            {% if reaction.reaction == 'love' %} ❤️ {% endif %}
+            {% if reaction.reaction == 'care' %} 🤗 {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p>No hay reacciones todavía.</p>
+{% endfor %}

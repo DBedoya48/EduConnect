@@ -1,0 +1,119 @@
+{% for post in posts %}
+    <div class="container mt-4" style="max-width: 800px;">
+        <div class="card mb-4 p-3 shadow-sm"
+            {% if post.category %}
+                style="border-left: 5px solid {{ post.category.color }}; border-radius: 30px;"
+            {% endif %}>
+
+            <div class="d-flex align-items-start mb-2 justify-content-between">
+                <div>
+                    <strong class="me-2">
+                        {{ post.author.first_name }}
+                    </strong>
+                    <span class="px-2 py-1 rounded small fw-semibold
+                        {% if post.author.role == 'DOCENTE' %}
+                            bg-primary
+                        {% elif post.author.role == 'INVESTIGADOR' %}
+                            bg-warning text-dark
+                        {% elif post.author.role == 'ADMIN' %}
+                            bg-danger
+                        {% else %}
+                            bg-success
+                        {% endif %}
+                    ">
+                        {{ post.author.get_role_display }}
+                    </span>
+                </div>
+                <div>
+                    <small class="text-muted">
+                        {{ post.created_at }}
+                        {{"hace"}}
+                        {{ post.created_at|timesince }}
+                    </small>
+                </div>
+            </div>
+            <div>
+                {% if post.category %}
+                    <span class="badge"
+                        style="background-color: {{ post.category.color }};width:15rem; margin: 1rem 30%">
+                        {{ post.category.name }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <p class="mt-2">{{ post.content }}</p>
+
+            {% if post.image %}
+                <img src="{{ post.image.url }}"
+                    class="img-fluid rounded mt-2"
+                    style="max-height: 400px; object-fit: contain;">
+            {% endif %}
+
+            {% if post.file %}
+                <div class="mt-2 p-2 rounded"
+                    style="background-color:#2c2f36;">
+                    <a href="{{ post.file.url }}" target="_blank"
+                    class="text-decoration-none fw-semibold" 
+                    style="color: rgb(26, 170, 170);">
+                        📄 {{ post.file.name|cut:"posts/files/" }}
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if post.link %}
+                <p><a href="{{ post.link }}" target="_blank">{{ post.link }}</a></p>
+            {% endif %}
+            <div class="d-flex gap-3 mb-2">
+                <a href="{% url 'react_post' post.id 'like' %}" class="text-decoration-none">
+                    👍 {{ post.likes_count }}
+                </a>
+
+                <a href="{% url 'react_post' post.id 'love' %}" class="text-decoration-none">
+                    ❤️ {{ post.love_count }}
+                </a>
+
+                <a href="{% url 'react_post' post.id 'care' %}" class="text-decoration-none">
+                    🤝 {{ post.care_count }}
+                </a>
+                <a href="#" class="text-decoration-none view-reactions" data-post-id="{{ post.id }}">
+                    ver más...
+                </a>           
+            </div>    
+            <div>
+                <h6 class="text-muted">reacciones ({{ post.reactions.count }})</h6>
+            </div>      
+            <div class="comments-section">
+                <h6 class="text-muted">Comentarios ({{ post.comments.count }})</h6>
+
+                {% for comment in post.comments.all %}
+                    <div class="mb-2 p-2 rounded bg-dark-subtle">
+                        <strong style="color: rgb(60, 62, 180);">
+                            {{ comment.user.first_name }}
+                        </strong>
+                        
+                        <small class="text-muted">
+                            • {{ comment.created_at|timesince }} ago
+                        </small>
+
+                        <div>
+                            {{ comment.content }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">Sé el primero en comentar</p>
+                {% endfor %}
+            </div>
+            {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'add_comment' post.id %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="content" class="form-control" placeholder="Escribe un comentario..." required>
+                        <button class="btn btn-primary">Enviar</button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p>No hay publicaciones aún.</p>
+{% endfor %}

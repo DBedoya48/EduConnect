@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+        <div class="card shadow-sm p-4 border-0">
+            <h4 class="mb-4 text-center fw-bold">
+                Nueva publicación
+            </h4>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+
+                        {% if field.name == "category" %}
+
+                            <label class="form-label">Categoría</label>
+                            <select name="category" id="categorySelect" class="form-select">
+                                {% for cat in field.field.queryset %}
+                                    <option value="{{ cat.id }}" data-color="{{ cat.color }}"
+                                        {% if field.value == cat.id %}selected{% endif %}>
+                                        {{ cat.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                        {% else %}
+
+                            {{ field.label_tag }}
+                            {{ field }}
+
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="text-danger small">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary rounded-3">
+                        Publicar
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const select = document.getElementById("categorySelect");
+
+    if (select) {
+        function updateColor() {
+            const selectedOption = select.options[select.selectedIndex];
+            const color = selectedOption.getAttribute("data-color");
+
+            if (color) {
+                select.style.backgroundColor = color;
+                select.style.color = "#fff";
+                select.style.border = "none";
+            }
+        }
+
+        select.addEventListener("change", updateColor);
+        updateColor();
+    }
+</script>
+
+{% endblock %}

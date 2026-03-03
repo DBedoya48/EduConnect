@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3 class="mb-4">Publicaciones recientes</h3>
+
+<div id="post-container">
+    {% include "posts/partials/post_list.html" %}
+</div>
+
+<div id="loading" class="text-center my-4" style="display:none;">
+    Cargando...
+</div>
+
+{% block modals %}
+    <div class="modal fade" id="reactionsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Reacciones</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="reactionsModalBody">
+                Cargando...
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<script>
+let page = 2;
+let loading = false;
+
+window.addEventListener('scroll', () => {
+    if (loading) return;
+
+    if  (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+            loading = true;
+            document.getElementById('loading').style.display = 'block';
+
+            fetch(`?page=${page}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.html.trim() === "") {
+                loading = false;
+                document.getElementById('loading').style.display = 'none';
+                return;
+                }
+
+                document.getElementById('post-container')
+                .insertAdjacentHTML('beforeend', data.html);
+
+                page++;
+                loading = false;
+                document.getElementById('loading').style.display = 'none';
+            });
+        }
+    });
+
+    document.addEventListener("click", function(e) {
+
+        if (e.target.closest(".view-reactions")) {
+            e.preventDefault();
+
+            const button = e.target.closest(".view-reactions");
+            const postId = button.dataset.postId;
+
+            fetch(`/post/${postId}/reactions/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("reactionsModalBody").innerHTML = data.html;
+
+                    const modal = new bootstrap.Modal(
+                        document.getElementById('reactionsModal')
+                    );
+                    modal.show();
+                });
+        }
+
+    });
+</script>
+
+{% endblock %}
+
+
