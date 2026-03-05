@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from datetime import datetime, timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,13 +142,13 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = "45esteban26@gmail.com"
-EMAIL_HOST_PASSWORD = "sond jnfo rext qvaf"
+EMAIL_HOST_USER = "bedoteban@gmail.com"
+EMAIL_HOST_PASSWORD = "sgbh kter holo bhyh"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 PASSWORD_RESET_TIMEOUT = 7200
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
@@ -159,3 +160,9 @@ if not DEBUG:
     )
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+APPEND_SLASH=False
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+}

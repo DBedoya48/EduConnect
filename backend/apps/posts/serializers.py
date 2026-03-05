@@ -19,7 +19,7 @@ class ReactionSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(read_only=True)
+    author = serializers.ReadOnlyField(source="author.username")
     comments = CommentSerializer(many=True, read_only=True)
     reactions = ReactionSerializer(many=True, read_only=True)
 
@@ -29,14 +29,5 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = [
-            "id",
-            "author",
-            "content",
-            "created_at",
-            "likes_count",
-            "love_count",
-            "care_count",
-            "comments",
-            "reactions",
-        ]
+        fields = "__all__"
+    read_only_fields = ["author", "created_at"]

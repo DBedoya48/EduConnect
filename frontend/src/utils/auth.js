@@ -1,14 +1,19 @@
-export const login = (tokens) => {
-  localStorage.setItem("access", tokens.access);
-  localStorage.setItem("refresh", tokens.refresh);
-};
+import axios from "../api/axios";
 
-export const logout = () => {
+export async function login(username, password) {
+  const res = await axios.post("/login/", {
+    username,
+    password,
+  });
+
+  localStorage.setItem("access", res.data.access);
+  localStorage.setItem("refresh", res.data.refresh);
+
+  return res.data;
+}
+
+export function logout () {
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
   window.location.href = "/login";
-};
-
-export const isAuthenticated = () => {
-  return !!localStorage.getItem("access");
 };

@@ -16,10 +16,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "email",
+            "username",
             "password",
             "first_name",
             "last_name",
             "institution",
+            "role",
         ]
 
     def validate_email(self, value):
@@ -30,14 +32,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        password = validated_data.pop("password")
-
-        user = User(**validated_data)
-        user.set_password(password)
-        user.is_active = False
-        user.role = "ESTUDIANTE"
-        user.save()
-
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+            role=Roles.ESTUDIANTE,
+            is_active=False
+        )
         return user
 
 

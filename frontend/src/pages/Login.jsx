@@ -1,29 +1,21 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { login } from "../utils/auth";
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/token/",
-        {
-          email,
-          password,
-        }
-      );
-
-      login(res.data);
+      await login(username, password);
       navigate("/");
-    } catch (error) {
-      alert("Credenciales inválidas");
+    } catch (err) {
+      setError("Credenciales incorrectas");
     }
   };
 
@@ -38,8 +30,8 @@ function Login() {
           <input
             type="text"
             placeholder="Usuario"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -50,7 +42,11 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-
+          {error && (
+            <p className="text-red-500 text-sm mb-4">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"

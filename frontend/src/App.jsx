@@ -1,17 +1,13 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, } from "react-router-dom";
 import Login from "./pages/Login";
 import Feed from "./pages/Feed";
-import { isAuthenticated } from "./utils/auth";
-
-function PrivateRoute({ children }) {
-  return isAuthenticated() ? children : <Navigate to="/login" />;
-}
-
+import PrivateRoute from "./components/PrivateRoute";
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+
         <Route
           path="/"
           element={
@@ -24,5 +20,6 @@ function App() {
     </BrowserRouter>
   );
 }
+
 
 export default App;

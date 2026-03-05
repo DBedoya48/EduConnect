@@ -1,3 +1,4 @@
+from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -51,7 +52,6 @@ class UserViewSet(ModelViewSet):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(role="student", is_active=False)
 
         user = serializer.save(is_active=False, role="student")
 
@@ -67,6 +67,7 @@ class UserViewSet(ModelViewSet):
             message=f"Bienvenido a Educonnect, ahora activa tu cuenta aquí:\n{activation_link}",
             from_email=settings.EMAIL_HOST_USER,
             recipient_list=[user.email],
+            fail_silently=False,
         )
 
         return Response(

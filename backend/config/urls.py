@@ -20,13 +20,14 @@ def api_root(request):
 urlpatterns = [
     path("", api_root),
     path('admin/', admin.site.urls),
-    path("api/", include("apps.posts.urls")),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("api/posts/", include("apps.posts.urls")),
     path("api/users/", include("apps.users.urls")),
     path("api/courses/", include("apps.courses.urls")),
+    path("api/login/", TokenObtainPairView.as_view(), name="login"),
+    path("api/refresh/", TokenRefreshView.as_view(), name="refresh"),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 

@@ -2,9 +2,10 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
 
 from django.db.models import Count, Q
+from django.db.models.functions import Random
 from django.shortcuts import get_object_or_404
 
 from .models import Post, Comment, Reaction
@@ -12,15 +13,22 @@ from .serializers import PostSerializer, CommentSerializer, ReactionSerializer
 
 
 class PostViewSet(ModelViewSet):
+    queryset = Post.objects.all().order_by("-created_at")
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Post.objects.annotate(
-            likes_count=Count('reactions', filter=Q(reactions__reaction='like')),
-            love_count=Count('reactions', filter=Q(reactions__reaction='love')),
-            care_count=Count('reactions', filter=Q(reactions__reaction='care')),
-        ).order_by("-created_at")
+        return (
+            Post.objects
+            .select_related("author")
+            .prefetch_related("comments__user", "reactions__user")
+            .annotate(
+                likes_count=Count('reactions', filter=Q(reactions__reaction='like')),
+                love_count=Count('reactions', filter=Q(reactions__reaction='love')),
+                care_count=Count('reactions', filter=Q(reactions__reaction='care')),
+            )
+            .order_by("-created_at")
+        )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -79,3 +87,9 @@ class PostViewSet(ModelViewSet):
         post = self.get_object()
         reactions = post.reactions.select_related("user")
         return Response(ReactionSerializer(reactions, many=True).data)
+        
+    @action(detail=False, methods=["get"])
+    def random(self, request):
+        posts = Post.objects.order_by(Random())
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
