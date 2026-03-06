@@ -9,12 +9,12 @@ class Post(models.Model):
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
     content = models.TextField(blank=True)
-
+    description = models.TextField(blank=True)
     image = models.ImageField(upload_to="posts/images/", blank=True, null=True)
     file = models.FileField(upload_to="posts/files/", blank=True, null=True)
     link = models.URLField(blank=True, null=True)
 
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="posts")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

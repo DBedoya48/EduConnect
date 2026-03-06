@@ -2,6 +2,10 @@ import { BrowserRouter, Routes, Route, } from "react-router-dom";
 import Login from "./pages/Login";
 import Feed from "./pages/Feed";
 import PrivateRoute from "./components/PrivateRoute";
+import "./index.css";
+
+
+
 function App() {
   return (
     <BrowserRouter>

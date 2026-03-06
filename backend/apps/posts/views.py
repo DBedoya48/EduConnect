@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 
@@ -16,6 +17,7 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.all().order_by("-created_at")
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_queryset(self):
         return (
@@ -29,6 +31,16 @@ class PostViewSet(ModelViewSet):
             )
             .order_by("-created_at")
         )
+        
+    def get_queryset(self):
+        queryset = Post.objects.all()
+
+        category = self.request.query_params.get("category")
+
+        if category:
+            queryset = queryset.filter(category_id=category)
+
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -87,7 +99,7 @@ class PostViewSet(ModelViewSet):
         post = self.get_object()
         reactions = post.reactions.select_related("user")
         return Response(ReactionSerializer(reactions, many=True).data)
-        
+
     @action(detail=False, methods=["get"])
     def random(self, request):
         posts = Post.objects.order_by(Random())
