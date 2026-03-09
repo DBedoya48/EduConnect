@@ -1,19 +1,29 @@
-import axios from "../api/axios";
+import axios from "axios";
 
-export async function login(username, password) {
-  const res = await axios.post("/login/", {
+const API_URL = "http://127.0.0.1:8000/api";
+
+export const login = async (username, password) => {
+  const response = await axios.post(`${API_URL}/login/`, {
     username,
     password,
   });
 
-  localStorage.setItem("access", res.data.access);
-  localStorage.setItem("refresh", res.data.refresh);
+  const data = response.data;
+   console.log(response.data);
 
-  return res.data;
-}
+  // guardar tokens
+  localStorage.setItem("access", data.access);
+  localStorage.setItem("refresh", data.refresh);
+
+  // guardar usuario
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  return data;
+};
 
 export function logout () {
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
+  localStorage.removeItem("user")
   window.location.href = "/login";
-};
+}

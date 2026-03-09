@@ -1,4 +1,5 @@
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 function SubNavbar() {
 
@@ -8,15 +9,12 @@ function SubNavbar() {
     <div className="w-full bg-gradient-to-r from-gray-900 via-violet-400 to-gray-500 shadow-sm fixed top-16 left-0 z-4">
       <div className="max-w-7xl mx-auto px-6 flex items-center gap-8 h-12 text-purple-950">
 
-        <a href="/feed" className="font-medium hover:text-blue-600">
+        <Link to="/" className="font-medium hover:text-blue-600">
           Inicio
-        </a>
+        </Link>
+        <Link to="/Profile">Perfil</Link>
 
-        <a href="/explorar" className="font-medium hover:text-blue-600">
-          Explorar
-        </a>
-
-        {user?.role === "teacher" && (
+        {user?.role === "docente" && (
           <a href="/mis-clases" className="font-medium hover:text-blue-600">
             Mis clases
           </a>

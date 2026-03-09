@@ -1,8 +1,13 @@
 import axios from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 import { useEffect, useState, useRef } from "react";
 import MainLayout from "../layouts/MainLayout";
+import { Link } from "react-router-dom";
+import CommentList from "../components/comments/CommentList";
+import CommentForm from "../components/comments/CommentForm";
 
 function Feed() {
+  const user = JSON.parse(localStorage.getItem("user"));
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [posts, setPosts] = useState([]);
@@ -17,6 +22,7 @@ function Feed() {
   const dropdownRef = useRef(null);
   const imageRef = useRef(null);
   const fileRef = useRef(null);
+
   const fetchPosts = async (url) => {
     try {
       setLoading(true);
@@ -109,13 +115,31 @@ function Feed() {
       await axios.post(`/posts/${postId}/react/`, {
         reaction: reactionType,
       });
-
-      // Volver a pedir los posts para tener contadores reales
       fetchPosts("/posts/");
     } catch (err) {
       console.error("Error reaccionando:", err);
     }
   };
+  const deleteComment = async (id) => {
+    try {
+      await axios.delete(`/comments/${id}/`);
+      fetchPosts("/posts/");
+    } catch (error) {
+      console.error("Error eliminando comentario", error);
+    }
+  };
+
+  const editComment = async (id, newContent) => {
+    try {
+      await axios.patch(`/comments/${id}/`, {
+        content: newContent,
+      });
+
+      fetchPosts("/posts/");
+    } catch (error) {
+      console.error("Error editando comentario", error);
+  }
+};
   console.log(posts);
   return (
     <MainLayout>
@@ -304,34 +328,16 @@ function Feed() {
                   </button>
                 </div>
                 <div>
-                  {post.comments?.length > 0 && (
-                    <div className="mt-4 border-t pt-3 space-y-2">
-                      {post.comments.map((comment) => (
-                        <div key={comment.id} className="text-sm">
-                          <span className="font-semibold">
-                            {comment.user}
-                          </span>{" "}
-                          {comment.content}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const content = e.target.comment.value;
-                      axios.post(`/posts/${post.id}/comment/`, { content })
-                        .then(() => fetchPosts("/posts/"));
-                        e.target.reset();
-                        fetchPosts("/posts/");
-                    }}
-                  >
-                    <input
-                      name="comment"
-                      placeholder="Escribe un comentario..."
-                      className="w-full border rounded-lg p-2 mt-3"
-                    />
-                  </form>
+                  <CommentList
+                    comments={post.comments}
+                    user={user}
+                    editComment={editComment}
+                    deleteComment={deleteComment}
+                  />
+                  <CommentForm
+                    postId={post.id}
+                    refreshPosts={() => fetchPosts("/posts/")}
+                  />
                 </div>
               </div>
             ))}

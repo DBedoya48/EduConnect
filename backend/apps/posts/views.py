@@ -1,3 +1,5 @@
+from .models import Comment
+from .permissions import IsOwnerComment
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -105,3 +107,15 @@ class PostViewSet(ModelViewSet):
         posts = Post.objects.order_by(Random())
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
+
+class CommentViewSet(ModelViewSet):
+
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_permissions(self):
+
+        if self.action in ["update", "partial_update", "destroy"]:
+            return [IsAuthenticated(), IsOwnerComment()]
+
+        return [IsAuthenticated()]

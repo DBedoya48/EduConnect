@@ -164,5 +164,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 APPEND_SLASH=False
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "TOKEN_OBTAIN_SERIALIZER": "apps.users.serializers.CustomTokenSerializer",
 }

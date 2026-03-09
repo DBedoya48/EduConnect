@@ -3,6 +3,7 @@ from django.conf import settings
 from django.urls import path, include
 from django.conf.urls.static import static
 from apps.categories.views import CategoryViewSet
+from apps.posts.views import CommentViewSet
 from apps.posts.views import PostViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -14,6 +15,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 router = DefaultRouter()
 router.register(r"posts", PostViewSet)
 router.register(r"categories", CategoryViewSet)
+router.register(r'comments', CommentViewSet)
 
 @api_view(["GET"])
 @permission_classes([AllowAny])

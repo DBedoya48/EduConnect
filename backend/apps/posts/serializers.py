@@ -3,15 +3,22 @@ from .models import Post, Comment, Reaction
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
+    user = serializers.CharField(source="user.username", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
 
     class Meta:
         model = Comment
-        fields = ["id", "user", "content", "created_at"]
+        fields = ["id", "user", "user_id", "content", "created_at"]
+    def create(self, validated_data):
+        request = self.context.get("request")
 
+        return Comment.objects.create(
+            user=request.user,
+            **validated_data
+        )
 
 class ReactionSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
+    user = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
         model = Reaction
