@@ -5,6 +5,7 @@ import MainLayout from "../layouts/MainLayout";
 import { Link } from "react-router-dom";
 import CommentList from "../components/comments/CommentList";
 import CommentForm from "../components/comments/CommentForm";
+import fondoImagen from '../fondos/darkFondo.png';
 
 function Feed() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -143,14 +144,18 @@ function Feed() {
   console.log(posts);
   return (
     <MainLayout>
-      <div className="bg-gray-400 min-h-screen mt-10">
+      
+      <div 
+      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: `url(${fondoImagen})` }}
+      >
         <div className="w-full grid grid-cols-12 gap-6 px-10">
 
           {/* 🔵 COLUMNA IZQUIERDA - FORM STICKY */}
           <div className="lg:col-span-3 pl-6 sticky top-40 self-start">
             <form
               onSubmit={handleCreatePost}
-              className="bg-white shadow-md rounded-2xl p-3 "
+              className="bg-slate-500 shadow-md rounded-2xl p-3 "
             >
               <h3 className="font-semibold mb-4">Crear publicación</h3>
 
@@ -254,7 +259,7 @@ function Feed() {
             )}
 
             {!loading && posts.length === 0 && (
-              <div className="bg-white rounded-2xl shadow-md p-6 text-center text-gray-500">
+              <div className="bg-slate-500 rounded-2xl shadow-md p-6 text-center text-gray-500">
                 📭 Esta categoría aún no tiene publicaciones
               </div>
             )}
@@ -262,7 +267,7 @@ function Feed() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="bg-gray-300 shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl p-6 border border-l-8 min-w-3"
+                className="bg-slate-400 shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl p-6 border border-l-8 min-w-3"
                 style={{ borderColor: post.category_color || "#e5e7eb",
                 }}
                 >
@@ -345,7 +350,7 @@ function Feed() {
 
           {/* 🟣 COLUMNA DERECHA - CATEGORÍAS */}
           <div className="lg:col-span-3 pr-6 sticky top-40 self-start">
-            <div className="bg-white shadow-md rounded-2xl p-6">
+            <div className="bg-slate-500 shadow-md rounded-2xl p-6">
               <h3 className="font-semibold mb-4">Categorías</h3>
               <div
                 onClick={fetchRandomPosts}

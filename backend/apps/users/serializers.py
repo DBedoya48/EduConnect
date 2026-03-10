@@ -22,15 +22,14 @@ class RegisterSerializer(serializers.ModelSerializer):
             "password",
             "first_name",
             "last_name",
-            "institution",
-            "role",
+            "institution"
         ]
 
     def validate_email(self, value):
         if not value.endswith("@gmail.com"):
-            raise serializers.ValidationError(
-                "Debe usar un correo institucional válido"
-            )
+            raise serializers.ValidationError("Debe usar un correo institucional válido")
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Este correo ya está registrado")
         return value
 
     def create(self, validated_data):
@@ -38,7 +37,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             email=validated_data["email"],
             password=validated_data["password"],
-            role="estudiante",
+            first_name=validated_data.get("first_name"),
+            last_name=validated_data.get("last_name"),
+            institution=validated_data.get("institution"),
+            role=User.Roles.ESTUDIANTE,
             is_active=False
         )
         return user

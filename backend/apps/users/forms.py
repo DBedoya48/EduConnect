@@ -15,7 +15,7 @@ class RegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email", "first_name", "last_name", "institution"]
+        fields = ["email","username", "first_name", "last_name", "institution"]
 
     def clean(self):
         cleaned_data = super().clean()
@@ -29,8 +29,9 @@ class RegisterForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.role = User.Roles.ESTUDIANTE  # 🔥 Forzar rol estudiante
-        user.set_password(self.cleaned_data["password1"])  # 🔥 Hash correcto
+        user.role = User.Roles.ESTUDIANTE
+        user.is_active = False
+        user.set_password(self.cleaned_data["password1"])
 
         if commit:
             user.save()

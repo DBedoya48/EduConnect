@@ -11,10 +11,12 @@ from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 
 from .serializers import UserSerializer, RegisterSerializer
 from .permissions import IsDocenteOrAdmin
+from .permissions import CanCreateUsers
 from .tokens import EmailVerificationTokenGenerator
 
 User = get_user_model()
@@ -58,7 +60,10 @@ class UserViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.save(is_active=False, role="student")
+        user = serializer.save(
+            is_active=False,
+            role=User.Roles.ESTUDIANTE
+        )
 
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = token_generator.make_token(user)
@@ -69,10 +74,9 @@ class UserViewSet(ModelViewSet):
 
         send_mail(
             subject="Activación de cuenta",
-            message=f"Bienvenido a Educonnect, ahora activa tu cuenta aquí:\n{activation_link}",
+            message=f"Bienvenido a Educonnect, activa tu cuenta aquí:\n{activation_link}",
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[user.email],
-            fail_silently=False,
+            recipient_list=[user.email]
         )
 
         return Response(
@@ -112,15 +116,20 @@ class UserViewSet(ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    @action(detail=False, methods=["post"], permission_classes=[IsAdminUser])
+    @action(detail=False, methods=["post"], permission_classes=[CanCreateUsers])
     def create_staff(self, request):
+
+        role = request.data.get("role")
+
+        if request.user.role == "DOCENTE" and role != "ESTUDIANTE":
+            return Response(
+                {"error": "Docente solo puede crear estudiantes"},
+                status=403
+            )
 
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.save(
-            role="docente",
-            is_active=True
-        )
+        user = serializer.save(is_active=True)
 
-        return Response(UserSerializer(user).data, status=201)
+        return Response(UserSerializer(user).data)

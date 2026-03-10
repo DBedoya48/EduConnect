@@ -4,10 +4,14 @@ import MainLayout from "../layouts/MainLayout";
 
 function Profile() {
 
-  const { user, role } = useAuth();
+  const { user, role, loading } = useAuth();
+
+  if (loading) {
+    return <p>Cargando perfil...</p>;
+  }
 
   if (!user) {
-    return <p>Cargando perfil...</p>;
+    return <p>No autenticado</p>;
   }
   
   return (

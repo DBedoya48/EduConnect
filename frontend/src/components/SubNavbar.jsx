@@ -6,13 +6,14 @@ function SubNavbar() {
   const { user } = useAuth();
 
   return (
-    <div className="w-full bg-gradient-to-r from-gray-900 via-violet-400 to-gray-500 shadow-sm fixed top-16 left-0 z-4">
+    <div className="w-full z-50 h-16 bg-gradient-to-r from-yellow-950 via-gray-500 to-yellow-950 shadow-sm fixed top-16 left-0 z-4">
       <div className="max-w-7xl mx-auto px-6 flex items-center gap-8 h-12 text-purple-950">
 
         <Link to="/" className="font-medium hover:text-blue-600">
           Inicio
         </Link>
         <Link to="/Profile">Perfil</Link>
+        <Link to="/Register">crear usuario</Link>
 
         {user?.role === "docente" && (
           <a href="/mis-clases" className="font-medium hover:text-blue-600">

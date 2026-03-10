@@ -1,12 +1,11 @@
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const { user, logout, role } = useAuth();
   return (
-    <nav className="fixed top-0 w-full z-50 h-16 bg-gradient-to-r from-gray-900 via-violet-400 to-gray-500">
+    <nav className="fixed top-0 w-full z-50 h-16 bg-gradient-to-r from-yellow-950 via-gray-500 to-yellow-950">
       <div className="max-w-4xl mx-auto h-full p-4">
-        <h1 className="text-fuchsia-900 text-4xl text-center font-serif z-10">
+        <h1 className="text-neutral-950 text-4xl text-center font-serif z-10">
           EduConnect
         </h1>
         <div className="flex gap-4">

@@ -1,49 +1,16 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Login from "./pages/Login";
-import Feed from "./pages/Feed";
-import Profile from "./pages/Profile";
-import PrivateRoute from "./components/PrivateRoute";
-import "./index.css";
+import { AuthProvider } from "./context/AuthContext";
+import AppRouter from "./router/AppRouter";
 
 function App() {
+
   return (
-    <BrowserRouter>
-      <Routes>
+    <AuthProvider>
 
-        <Route path="/login" element={<Login />} />
+      <AppRouter />
 
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Feed />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/Feed"
-          element={
-            <PrivateRoute>
-              <Feed />
-            </PrivateRoute>
-          }
-        />
-
-      </Routes>
-    </BrowserRouter>
+    </AuthProvider>
   );
+
 }
 
 export default App;

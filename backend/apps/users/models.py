@@ -58,3 +58,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class Roles(models.TextChoices):
+    ADMIN = "admin", "Admin"
+    DOCENTE = "docente", "Docente"
+    ESTUDIANTE = "estudiante", "Estudiante"

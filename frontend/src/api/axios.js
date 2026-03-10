@@ -5,10 +5,26 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const publicRoutes = [
+    "/users/",
+    "/login/",
+    "/refresh/",
+    "/users/activate/"
+  ];
+
+  const isPublic = publicRoutes.some(route =>
+    config.url.includes(route)
+  );
+
+  if (!isPublic) {
+
+    const token = localStorage.getItem("access");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
   }
 
   return config;
