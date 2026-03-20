@@ -20,6 +20,7 @@ function Feed() {
   const [isOpen, setIsOpen] = useState(false);
   const [categoryForPost, setCategoryForPost] = useState("");
   const [activeFilter, setActiveFilter] = useState(null);
+  const [currentUrl, setCurrentUrl] = useState("/posts/");
   const dropdownRef = useRef(null);
   const imageRef = useRef(null);
   const fileRef = useRef(null);
@@ -38,9 +39,8 @@ function Feed() {
       setCategories(res.data.results || res.data);
     } catch (err) { /*...*/ }
   };
-
   useEffect(() => {
-    fetchPosts("/posts/");
+    fetchPosts(currentUrl);
     fetchCategories();
   }, []);
   useEffect(() => {
@@ -49,29 +49,33 @@ function Feed() {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const filterByCategory = async (categoryId) => {
+    const url = `/posts/?category=${categoryId}`;
+    setCurrentUrl(url);
     setActiveFilter(categoryId);
     
     try {
       setLoading(true);
-      const res = await axios.get(`/posts/?category=${categoryId}`);
+      const res = await axios.get(url);
       setPosts(res.data.results || res.data);
       setLoading(false);
     } catch (err) {
       console.error("Error filtrando:", err);
+      
       setLoading(false);
     }
   };
 
   const fetchRandomPosts = async () => {
+    const url = "/posts/random/";
+    setCurrentUrl(url);
     try {
       setLoading(true);
-      const res = await axios.get("/posts/random/");
+      const res = await axios.get(url);
       setPosts(res.data.results || res.data);
     } finally {
       setLoading(false);
@@ -95,8 +99,6 @@ function Feed() {
 
     try {
       const res = await axios.post("/posts/", formData);
-
-      // Agrega el nuevo post arriba del feed sin refetch
       setPosts((prevPosts) => [res.data, ...prevPosts]);
 
       setContent("");
@@ -116,31 +118,44 @@ function Feed() {
       await axios.post(`/posts/${postId}/react/`, {
         reaction: reactionType,
       });
-      fetchPosts("/posts/");
+      fetchPosts(currentUrl);
     } catch (err) {
       console.error("Error reaccionando:", err);
     }
   };
+  
   const deleteComment = async (id) => {
     try {
       await axios.delete(`/comments/${id}/`);
-      fetchPosts("/posts/");
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => ({
+          ...post,
+          comments: post.comments.filter((c) => c.id !== id),
+        }))
+      );
     } catch (error) {
       console.error("Error eliminando comentario", error);
     }
   };
-
   const editComment = async (id, newContent) => {
     try {
       await axios.patch(`/comments/${id}/`, {
         content: newContent,
       });
 
-      fetchPosts("/posts/");
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => ({
+          ...post,
+          comments: post.comments.map((c) =>
+            c.id === id ? { ...c, content: newContent } : c
+          ),
+        }))
+      );
     } catch (error) {
       console.error("Error editando comentario", error);
-  }
-};
+    }
+  };
   console.log(posts);
   return (
     <MainLayout>
@@ -149,42 +164,42 @@ function Feed() {
       className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"
       style={{ backgroundImage: `url(${fondoImagen})` }}
       >
-        <div className="w-full grid grid-cols-12 gap-6 px-10">
+        <div className="w-full grid grid-cols-12 gap-6 px-10 pt-8">
 
           {/* 🔵 COLUMNA IZQUIERDA - FORM STICKY */}
-          <div className="lg:col-span-3 pl-6 sticky top-40 self-start">
+          <div className="lg:col-span-3 pr-6 sticky top-40 self-start">
             <form
               onSubmit={handleCreatePost}
               className="bg-slate-500 shadow-md rounded-2xl p-3 "
             >
-              <h3 className="font-semibold mb-4">Crear publicación</h3>
+              <h3 className="font-semibold mb-4">Subir Post</h3>
 
               <input
                 type="text"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Título"
-                className="w-full border rounded-lg p-3"
+                className="w-full border rounded-lg p-3 mb-3 bg-slate-300"
               />
 
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Descripcion"
-                className="w-full border rounded-lg p-3"
+                className="w-full border rounded-lg p-3 mb-2 bg-slate-300"
               />
 
-              <div ref={dropdownRef} className="relative w-full">
+              <div ref={dropdownRef} className="relative w-full bg-slate-300 rounded-md text-white">
                 {/* BOTÓN PRINCIPAL */}
                 <div
                   onClick={() => setIsOpen(!isOpen)}
-                  className="border rounded-lg p-3 cursor-pointer text-white"
+                  className="border rounded-lg p-3 mb-3 cursor-pointer text-white"
                   style={{
                     backgroundColor:
                       categoryForPost
                         ? categories.find(c => c.id === categoryForPost)?.color
-                        : "#ffffff",
-                    color: categoryForPost ? "#ffffff" : "#6b7280"
+                        : "bg-slate-300",
+                    color: categoryForPost ? "white" : "#6b7280"
                   }}
                 >
                   {categoryForPost
@@ -194,7 +209,7 @@ function Feed() {
 
                 {/* LISTA DESPLEGABLE */}
                 {isOpen && (
-                  <div className="absolute w-full mt-1 border rounded-lg bg-white shadow z-10">
+                  <div className="absolute w-full mt-1 border rounded-md shadow z-10">
                     {categories.map((cat) => (
                       <div
                         key={cat.id}
@@ -218,18 +233,19 @@ function Feed() {
                 placeholder="Agregar enlace"
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
-                className="w-full border rounded-lg p-3 mb-3"
+                className="w-full border rounded-lg p-3 bg-slate-300"
               />
 
               <input
                 type="file"
                 ref={fileRef}
                 onChange={(e) => setFile(e.target.files[0])}
-                className="m-3"
+                className="w-full px-4 py-2 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                file:text-gray-950 file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor:pointer"
               />
 
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-500 mb-2">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-3">
+                <p className="text-sm text-gray-400 mb-2">
                   Arrastra una imagen o haz click
                 </p>
                 <input
@@ -237,13 +253,14 @@ function Feed() {
                   accept="image/*"
                   ref={imageRef}
                   onChange={(e) => setImage(e.target.files[0])}
-                  className="w-full"
+                  className="w-full px-4 py-2 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                file:text-gray-950 file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor:pointer"
                 />
               </div>
 
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full"
+                className="bg-slate-700 hover:bg-slate-600 text-gray-950 px-4 py-2 rounded-lg w-full"
               >
                 Publicar
               </button>
@@ -341,7 +358,7 @@ function Feed() {
                   />
                   <CommentForm
                     postId={post.id}
-                    refreshPosts={() => fetchPosts("/posts/")}
+                    refreshPosts={() => fetchPosts(currentUrl)}
                   />
                 </div>
               </div>
@@ -349,7 +366,7 @@ function Feed() {
           </div>
 
           {/* 🟣 COLUMNA DERECHA - CATEGORÍAS */}
-          <div className="lg:col-span-3 pr-6 sticky top-40 self-start">
+          <div className="lg:col-span-3 pl-6 sticky top-40 self-start">
             <div className="bg-slate-500 shadow-md rounded-2xl p-6">
               <h3 className="font-semibold mb-4">Categorías</h3>
               <div

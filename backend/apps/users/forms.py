@@ -12,6 +12,7 @@ class RegisterForm(forms.ModelForm):
         label="Confirmar contraseña",
         widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
+    
 
     class Meta:
         model = User

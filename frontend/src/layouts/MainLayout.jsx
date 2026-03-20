@@ -2,10 +2,11 @@ import Navbar from "../components/Navbar";
 import SubNavbar from "../components/SubNavbar";
 
 export default function MainLayout({ children }) {
+  const user = JSON.parse(localStorage.getItem("user"));
   return (
     <>
-      <Navbar />
-      <SubNavbar />
+      {user && <Navbar />}
+      {user && <SubNavbar />}
 
       <div className="pt-28">
         {children}

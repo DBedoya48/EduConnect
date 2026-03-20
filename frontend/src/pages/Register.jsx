@@ -1,23 +1,25 @@
-import { useState } from "react";
 import api from "../api/axios";
+import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
+import fondoImagen from '../fondos/darkFondo.png';
+import { useNavigate, useLocation } from "react-router-dom";
+
+const initialForm = {username: "", email: "", password: "", first_name: "", last_name: "", institution: "", role: "estudiante"};
 
 function Register() {
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const role = user?.role;
-
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    first_name: "",
-    last_name: "",
-    institution: "",
-    role: "estudiante"
-  });
+  const role = user?.role || null;
+  const navigate = useNavigate();
+  const location=useLocation();
+  const [formData, setFormData] = useState(initialForm);
 
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setFormData(initialForm);
+    setMessage("");
+  }, [location.pathname]);
 
   const handleChange = (e) => {
 
@@ -37,6 +39,7 @@ function Register() {
       const response = await api.post("/users/", formData);
 
       setMessage(response.data.message || "Usuario creado correctamente");
+      setFormData(initialForm);
 
     } catch (error) {
 
@@ -52,9 +55,11 @@ function Register() {
 
   return (
     <MainLayout>
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex justify-center min-h-screen"
+        style={{ backgroundImage: `url(${fondoImagen})` }}
+        >
 
-        <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+        <div className="bg-slate-500 shadow-lg rounded-xl p-8 w-full max-w-md">
 
             <h2 className="text-2xl font-bold text-center mb-6">
             Registro de Usuario
@@ -68,7 +73,8 @@ function Register() {
                 placeholder="Usuario"
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-3  bg-slate-300 border rounded-lg"
+                value={formData.username}
             />
 
             <input
@@ -77,7 +83,8 @@ function Register() {
                 placeholder="Correo"
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-3 bg-slate-300 border rounded-lg"
+                value={formData.email}
             />
 
             <input
@@ -86,7 +93,8 @@ function Register() {
                 placeholder="Contraseña"
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-3 bg-slate-300 border rounded-lg"
+                value={formData.password}
             />
 
             <input
@@ -94,7 +102,8 @@ function Register() {
                 name="first_name"
                 placeholder="Nombre"
                 onChange={handleChange}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-3 bg-slate-300 border rounded-lg"
+                value={formData.first_name}
             />
 
             <input
@@ -102,7 +111,8 @@ function Register() {
                 name="last_name"
                 placeholder="Apellido"
                 onChange={handleChange}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-3 bg-slate-300 border rounded-lg"
+                value={formData.last_name}
             />
 
             <input
@@ -110,7 +120,8 @@ function Register() {
                 name="institution"
                 placeholder="Institución"
                 onChange={handleChange}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-3 bg-slate-300 border rounded-lg"
+                value={formData.institution}
             />
 
             {/* Selector de rol SOLO para docente o admin */}
@@ -120,7 +131,7 @@ function Register() {
                 <select
                 name="role"
                 onChange={handleChange}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 bg-slate-300 border rounded-lg"
                 >
 
                 <option value="estudiante">Estudiante</option>
@@ -137,7 +148,7 @@ function Register() {
 
             <button
                 type="submit"
-                className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition"
+                className="w-full bg-slate-600 text-white p-2 rounded-lg hover:bg-slate-300 transition"
             >
                 Crear usuario
             </button>
@@ -145,11 +156,19 @@ function Register() {
             </form>
 
             {message && (
-            <p className="mt-4 text-center text-sm text-red-500">
+            <p className="mt-4 text-center text-sm text-slate-900">
                 {message}
             </p>
             )}
 
+        </div>
+        <div>
+          <button
+            onClick={() => navigate(-1)}
+            className="m-4 bg-slate-500 text-gray-950 text-sm p-4 rounded-full hover:bg-slate-400"
+          >
+            ← Volver
+          </button>
         </div>
 
         </div>

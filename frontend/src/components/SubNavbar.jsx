@@ -6,60 +6,20 @@ function SubNavbar() {
   const { user } = useAuth();
 
   return (
-    <div className="w-full z-50 h-16 bg-gradient-to-r from-yellow-950 via-gray-500 to-yellow-950 shadow-sm fixed top-16 left-0 z-4">
-      <div className="max-w-7xl mx-auto px-6 flex items-center gap-8 h-12 text-purple-950">
+    <div className="w-full z-50 h-16 bg-gradient-to-r from-slate-800 via-gray-500 to-slate-900 shadow-md shadow-gray-500 fixed top-16 left-0 z-4">
+      <div className="max-w-7xl mx-auto px-6 flex items-center gap-8 h-12"
+      >
 
-        <Link to="/" className="font-medium hover:text-blue-600">
-          Inicio
-        </Link>
-        <Link to="/Profile">Perfil</Link>
-        <Link to="/Register">crear usuario</Link>
-
-        {user?.role === "docente" && (
-          <a href="/mis-clases" className="font-medium hover:text-blue-600">
-            Mis clases
-          </a>
+        {location.pathname !== "/" && (<Link to="/" className="font-medium hover:text-slate-300" >Inicio</Link>)}
+        <Link to="/Profile" className="font-medium hover:text-slate-300">Perfil</Link>
+        <Link to="/Notifications" className="font-medium hover:text-slate-300">Notificaciones</Link>
+        {user?.role === "DOCENTE" && (
+          <Link to="/docenteDashboard" className="font-medium hover:text-slate-300">crear eventos</Link>
         )}
 
-        {user?.role === "admin" && (
-          <a href="/admin" className="font-medium hover:text-red-600">
-            Panel Admin
-          </a>
+        {user?.role === "ADMIN" && (
+          <Link to="/Register" className="font-medium hover:text-slate-300">crear usuario</Link>
         )}
-
-        <div className="relative group">
-
-          <button className="font-medium hover:text-blue-600">
-            Recursos ▾
-          </button>
-
-          <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 w-40 border">
-
-            <a
-              href="/documentos"
-              className="block px-4 py-2 hover:bg-gray-100"
-            >
-              Documentos
-            </a>
-
-            <a
-              href="/videos"
-              className="block px-4 py-2 hover:bg-gray-100"
-            >
-              Videos
-            </a>
-
-            <a
-              href="/links"
-              className="block px-4 py-2 hover:bg-gray-100"
-            >
-              Links
-            </a>
-
-          </div>
-
-        </div>
-
       </div>
     </div>
   );

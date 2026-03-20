@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import Profile from "../pages/Profile";
+import Profile from "../pages/profile";
+import Notifications from "../pages/Notifications";
 import Feed from "../pages/Feed";
 
 import AdminDashboard from "../pages/AdminDashboard";
@@ -84,6 +85,15 @@ function AppRouter() {
           element={
             <PrivateRoute roles={["investigador"]}>
               <InvestDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/Notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
             </PrivateRoute>
           }
         />

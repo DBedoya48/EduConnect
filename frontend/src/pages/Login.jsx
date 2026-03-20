@@ -59,14 +59,14 @@ function Login() {
           />
 
           {error && (
-            <p className="text-red-500 text-sm">
+            <p className="text-slate-800 text-sm">
               {error}
             </p>
           )}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
+            className="w-full bg-slate-500 text-white p-3 rounded-lg hover:bg-slate-400"
           >
             Ingresar
           </button>

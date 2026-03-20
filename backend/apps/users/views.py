@@ -1,6 +1,7 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenSerializer
@@ -14,7 +15,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
-from .serializers import UserSerializer, RegisterSerializer
+from .serializers import UserSerializer, RegisterSerializer, UserUpdateSerializer
 from .permissions import IsDocenteOrAdmin
 from .permissions import CanCreateUsers
 from .tokens import EmailVerificationTokenGenerator
@@ -27,7 +28,7 @@ class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenSerializer
 
 class UserViewSet(ModelViewSet):
-
+    parser_classes = [MultiPartParser, FormParser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -84,12 +85,23 @@ class UserViewSet(ModelViewSet):
             status=status.HTTP_201_CREATED
         )
 
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get", "patch"], permission_classes=[IsAuthenticated])
     def me(self, request):
 
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data)
+        if request.method == "GET":
+            serializer = UserSerializer(request.user)
+            return Response(serializer.data)
 
+        elif request.method == "PATCH":
+            serializer = UserUpdateSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data)
     @action(
         detail=False,
         methods=["get"],
